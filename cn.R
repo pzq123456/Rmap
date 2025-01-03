@@ -20,7 +20,7 @@ charger_data_sf <- st_as_sf(charger_data, coords = c("lon", "lat"), crs = st_crs
 
 # 创建密度栅格
 # 定义栅格分辨率
-grid_resolution <- 0.05  # 单位为经纬度
+grid_resolution <- 0.1  # 单位为经纬度
 bounding_box <- st_bbox(country_boundary)  # 提取边界框
 
 # 创建空栅格
@@ -48,20 +48,21 @@ density_matrix <- as.matrix(charger_density)
 density_matrix <- t(density_matrix)
 
 # 自定义调色板
-texture <- grDevices::colorRampPalette(c("#ffffff", "#dde5b6","#a3b18a","#588157","#3a5a40","#344e41"))(256)
+texture <- grDevices::colorRampPalette(c( "#ffffff", "#9ecae1", "#6baed6", "#4292c6", "#2171b5", "#08519c", "#08306b"))(256)
 
 # 渲染3D密度图
 density_matrix %>%
   height_shade(texture = texture) %>%
-  add_shadow(ray_shade(density_matrix, sunaltitude = 20, sunangle = 220, zscale = 10), max_darken = 0.5) %>%
+  add_shadow(ray_shade(density_matrix, sunaltitude = 45, sunangle = 100, zscale = 5), max_darken = 0.7) %>%
   plot_3d(heightmap = density_matrix,
-          zscale = 5,
-          solid = FALSE,
-          windowsize = c(1200, 800),
-          phi = 60,
-          theta = 0,
-          zoom = 0.3,
-          background = "white")
+            zscale = 5,
+            solid = FALSE,
+            shadow = FALSE,
+            windowsize = c(1200, 1000), 
+            phi = 60, 
+            zoom = 0.7, 
+            theta = 360, 
+            background = "white") 
 
 # 保存渲染图像
-render_snapshot("charger_density_3d.png")
+render_snapshot("cn.png")
