@@ -56,10 +56,12 @@ plot_gg(
   width = 6, height = 6,
   scale = 250,  # 缩放比例
   multicore = TRUE,
-  windowsize = c(800, 800),
+  windowsize = c(1200, 1200),
   zoom = 0.75,
   phi = 40,
-  theta = 30
+  theta = 0,
+  solid = FALSE,
+  shadow = FALSE,
 )
 
 # 保存三维渲染的快照

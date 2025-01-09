@@ -45,23 +45,11 @@ density_plot <- ggplot() +
   # 绘制密度图
   geom_raster(data = density_df, aes(x = x, y = y, fill = density)) +
   scale_fill_gradientn(
-    colors = c(
-      "#f7f4f9", 
-      # "#e7e1ef", "#d4b9da", "#c994c7", 
-               "#df65b0", "#e7298a", "#ce1256", "#980043"
-              #  , "#67001f"
-                ),
+    colors = c("#f7f4f9", "#df65b0", "#e7298a", "#ce1256", "#980043"),
     name = "Density"
   ) +
   # 绘制省级边界
   geom_sf(data = country_boundary, color = "grey80", size = 0.2, fill = NA)
-  #  +
-  # theme_minimal() +
-  # labs(
-  #   title = "China Provincial Boundaries with Density Map (3D)",
-  #   subtitle = "Density of charging stations overlaid with provincial boundaries",
-  #   caption = "Data Source: cn.geojson & cn.csv"
-  # )
 
 # 渲染三维图
 plot_gg(
@@ -69,10 +57,12 @@ plot_gg(
   width = 6, height = 6,
   scale = 250,  # 缩放比例
   multicore = TRUE,
-  windowsize = c(800, 800),
+  windowsize = c(1200, 1200),
   zoom = 0.75,
   phi = 40,
-  theta = 30
+  theta = 0,
+  solid = FALSE,
+  shadow = FALSE,
 )
 
 # 保存三维渲染的快照
