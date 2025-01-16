@@ -83,7 +83,7 @@ finalPlot <- ggdraw() +
   draw_plot(map, 0, 0, 1, 1) +  # 绘制主图
   # draw_plot(legend, 0.05, 0.05, 0.28, 0.28)  # 绘制图例
   # 在左上角绘制图例
-  draw_plot(legend, 0.05, 0.75, 0.28, 0.28)
+  draw_plot(legend, 0.05, 0.55, 0.28, 0.28)
 
 
 # 显示最终图
