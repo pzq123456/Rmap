@@ -28,6 +28,7 @@ PATH3 = os.path.join(DATA_DIR2, 'GB_sample_boudary', 'gadm41_GBR_3.shp')
 SAVE_PATH = os.path.join(DATA_DIR2, 'cleaned.csv')
 SAVE_PATH2 = os.path.join(DATA_DIR2, 'merged.csv')
 SAVE_PATH3 = os.path.join(DATA_DIR2, 'masked.csv')
+SAVE_PATH4 = os.path.join(DATA_DIR2, 'normalized.csv')
 
 def clean_data(df):
     # 统计每个 evse_id 出现的次数
@@ -142,18 +143,24 @@ if __name__ == '__main__':
     # save_as_csv(df_merged, SAVE_PATH2) # 保存数据
 
     # 3.
-    df_cleaned = pd.read_csv(SAVE_PATH2) # 读取清洗后的数据
-    gdf = gpd.read_file(PATH3)
-    # "NAME_1" ILIKE '%Scotland%'
-    gdf = gdf[gdf['NAME_1'].str.contains('Scotland')]
-    gdf = gdf.to_crs(epsg=4326)
+    # df_cleaned = pd.read_csv(SAVE_PATH2) # 读取清洗后的数据
+    # gdf = gpd.read_file(PATH3)
+    # # "NAME_1" ILIKE '%Scotland%'
+    # gdf = gdf[gdf['NAME_1'].str.contains('Scotland')]
+    # gdf = gdf.to_crs(epsg=4326)
 
-    # 保存 gdf
-    # gdf.to_file(os.path.join(DATA_DIR2, 'Scotland_boundary.shp'))
+    # # 保存 gdf
+    # # gdf.to_file(os.path.join(DATA_DIR2, 'Scotland_boundary.shp'))
 
-    res = mask(gdf, df_cleaned)
-    save_as_csv(res, SAVE_PATH3) # 保存数据
+    # res = mask(gdf, df_cleaned)
+    # save_as_csv(res, SAVE_PATH3) # 保存数据
 
-    # 4.
+    # 4. 对 Z 和 evse_count 进行归一化处理 也是就说将 Z 和 evse_count 映射到 [0, 1] 区间
+    df = pd.read_csv(SAVE_PATH3)
+    df['Z'] = (df['Z'] - df['Z'].min()) / (df['Z'].max() - df['Z'].min())
+    df['evse_count'] = (df['evse_count'] - df['evse_count'].min()) / (df['evse_count'].max() - df['evse_count'].min())
+    save_as_csv(df, SAVE_PATH4) # 保存数据
+    
+
 
 
