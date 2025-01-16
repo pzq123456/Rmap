@@ -26,26 +26,44 @@ data <- data %>%
     EVCharingCount = as.numeric(EVCharingCount)
   )
 
-set.seed(123)  # 设置随机种子以确保可重复性
-data <- data %>%
-  mutate(
-    EVCharingCount = EVCharingCount + runif(n(), -0.0000001, 0.0000001)  # 添加微小噪声
-  )
+# library(dplyr)
 
-# # 手动定义分段区间
-# breaks_x <- quantile(data$Z, probs = seq(0, 1, length.out = 4), na.rm = TRUE)
-# breaks_y <- c(0.1, 0.4, 0.6, 1) 
-# # 使用 cut 函数手动分段
+# # 将经纬度坐标转换为新的分辨率
 # data <- data %>%
 #   mutate(
-#     Z_cut = cut(Z, breaks = breaks_x, include.lowest = TRUE),
-#     evse_count_cut = cut(evse_count, breaks = breaks_y, include.lowest = TRUE)
+#     X_new = floor(X / 0.05) * 0.05 + 0.025,  # 将经度转换为0.05分辨率的中心点
+#     Y_new = floor(Y / 0.05) * 0.05 + 0.025   # 将纬度转换为0.05分辨率的中心点
 #   )
 
-# # 使用手动分段结果进行双变量分析
-# data <- bi_class(data, x = Z_cut, y = evse_count_cut)
+# # 按新的经纬度坐标进行分组，并累加population和EVCharingCount
+# data_aggregated <- data %>%
+#   group_by(X_new, Y_new) %>%
+#   summarise(
+#     population = sum(population, na.rm = TRUE),
+#     EVCharingCount = sum(EVCharingCount, na.rm = TRUE)
+#   ) %>%
+#   ungroup()
 
-data <- bi_class(data, x = EVCharingCount, y = population, style = "quantile", dim = 4)
+# set.seed(123)  # 设置随机种子以确保可重复性
+# data <- data %>%
+#   mutate(
+#     EVCharingCount = EVCharingCount + runif(n(), -0.0000001, 0.0000001)  # 添加微小噪声
+#   )
+
+# 手动定义分段区间
+breaks_x <- c(0.027, 0.094, 0.182, 0.379, 1) # population
+breaks_y <- c(0.011, 0.043, 0.095, 0.224, 1) # EVCharingCount
+# 使用 cut 函数手动分段
+data <- data %>%
+  mutate(
+    population_cut = cut(population, breaks = breaks_x, include.lowest = FALSE, labels = c("Low", "Medium", "High", "Very High")),
+    eEVCharingCount_cut = cut(EVCharingCount, breaks = breaks_y, include.lowest = FALSE, labels = c("Low", "Medium", "High", "Very High"))
+  )
+
+# # 使用手动分段结果进行双变量分析
+data <- bi_class(data, x = eEVCharingCount_cut, y = population_cut, dim = 4)
+
+# data <- bi_class(data, x = EVCharingCount, y = population, style = "quantile", dim = 4)
 
 # data <- bi_class(data, x = Z, y = evse_count, dim = 4)
 
