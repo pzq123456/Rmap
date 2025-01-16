@@ -1,4 +1,6 @@
 setwd("/Users/panzhiqing/Desktop/Rmap/")
+# F:\pzq\Rmap
+# setwd("F:/pzq/Rmap")
 
 # 加载必要的库
 library(ggplot2)
