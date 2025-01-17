@@ -26,50 +26,34 @@ data <- data %>%
     EVCharingCount = as.numeric(EVCharingCount)
   )
 
-# library(dplyr)
-
-# # 将经纬度坐标转换为新的分辨率
-# data <- data %>%
-#   mutate(
-#     X_new = floor(X / 0.05) * 0.05 + 0.025,  # 将经度转换为0.05分辨率的中心点
-#     Y_new = floor(Y / 0.05) * 0.05 + 0.025   # 将纬度转换为0.05分辨率的中心点
-#   )
-
-# # 按新的经纬度坐标进行分组，并累加population和EVCharingCount
-# data_aggregated <- data %>%
-#   group_by(X_new, Y_new) %>%
-#   summarise(
-#     population = sum(population, na.rm = TRUE),
-#     EVCharingCount = sum(EVCharingCount, na.rm = TRUE)
-#   ) %>%
-#   ungroup()
 
 # set.seed(123)  # 设置随机种子以确保可重复性
 # data <- data %>%
 #   mutate(
-#     EVCharingCount = EVCharingCount + runif(n(), -0.0000001, 0.0000001)  # 添加微小噪声
+#     EVCharingCount = EVCharingCount + runif(n(), -0.0001, 0.0001)  # 添加微小噪声
 #   )
 
-# 手动定义分段区间
-breaks_x <- c(0.027, 0.094, 0.182, 0.379, 1) # population
-breaks_y <- c(0.011, 0.043, 0.095, 0.224, 1) # EVCharingCount
+# # 手动定义分段区间
+# breaks_x <- c(0.027, 0.094, 0.182, 0.379, 1) # population
+# breaks_y <- c(0.011, 0.043, 0.095, 0.224, 1) # EVCharingCount
+
+
+breaks_x <- c(0, 1.3990826764776994e-05, 4.6818527577032216e-05, 0.000229285122856, 1.0) # population
+breaks_y <- c(0, 0.010498320268756973, 0.02603583426651735, 0.0643896976483762, 1.0) # EVCharingCount
+
+
+
 # 使用 cut 函数手动分段
 data <- data %>%
   mutate(
-    population_cut = cut(population, breaks = breaks_x, include.lowest = FALSE, labels = c("Low", "Medium", "High", "Very High")),
-    eEVCharingCount_cut = cut(EVCharingCount, breaks = breaks_y, include.lowest = FALSE, labels = c("Low", "Medium", "High", "Very High"))
+    population_cut = cut(population, breaks = breaks_x, include.lowest = TRUE, labels = c("25%", "50%", "75%", "100%")),
+    EVCharingCount_cut = cut(EVCharingCount, breaks = breaks_y, include.lowest = TRUE, labels = c("25%", "50%", "75%", "100%"))
   )
 
-# # 使用手动分段结果进行双变量分析
-data <- bi_class(data, x = eEVCharingCount_cut, y = population_cut, dim = 4)
+# 使用手动分段结果进行双变量分析
+data <- bi_class(data, x = EVCharingCount_cut, y = population_cut, dim = 4)
 
 # data <- bi_class(data, x = EVCharingCount, y = population, style = "quantile", dim = 4)
-
-# data <- bi_class(data, x = Z, y = evse_count, dim = 4)
-
-
-# 查看分类结果
-head(data)
 
 # 设置双变量颜色调色板
 pallet <- "BlueOr"
@@ -81,7 +65,7 @@ map <- ggplot() +
   ylim(min(data$Y), max(data$Y)) +  # 设置 Y 轴范围
   geom_raster(data = data, mapping = aes(x = X, y = Y, fill = bi_class), color = NA, linewidth = 0.1, show.legend = FALSE) +
   bi_scale_fill(pal = pallet, dim = 4, flip_axes = FALSE, rotate_pal = FALSE) +  # 应用双变量颜色
-  geom_sf(data = boundary, fill = NA, color = "gray", linewidth = 0.1) +  # 添加苏格兰边界
+  geom_sf(data = boundary, fill = NA, color = "black", linewidth = 0.2) +  # 添加苏格兰边界
   labs(title = "Bi-variate Map of population and EVCharingCount") +
   theme(plot.title = element_text(hjust = 0.5, face = "bold"),
         plot.subtitle = element_text(hjust = 0.5),
