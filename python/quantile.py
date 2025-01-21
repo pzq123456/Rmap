@@ -8,6 +8,7 @@ DIR = os.path.dirname(__file__)
 DATA_DIR = os.path.join(DIR, '..', 'data')
 DATA_DIR2 = os.path.join(DATA_DIR, '人口-充电桩双变量地图')
 SAVE_PATH4 = os.path.join(DATA_DIR2, 'normalized.csv')
+SAVE_PATH5 = os.path.join(DATA_DIR2, 'masked2.csv')
 
 
 
@@ -98,7 +99,7 @@ def bar_chart(df,name):
 # print("Breaks for EV Charging Count:", breaks_y)
 
 if __name__ == "__main__":
-    df = pd.read_csv(SAVE_PATH4)
+    df = pd.read_csv(SAVE_PATH5)
     # print(df.head())
     # 分别统计 Z 和 evse_count 两列的分位数间断点
     # breaks_x = generate_breaks(df['Z'], [0, 0.1, 0.25, 0.5, 0.75, 1])

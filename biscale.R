@@ -9,7 +9,7 @@ library(cowplot)    # 用于组合图和图例
 library(dplyr)      # 用于数据处理
 
 # 读取数据
-data <- read.csv("data/normalized.csv")
+data <- read.csv("data/masked2.csv")
 
 # 读取苏格兰边界数据
 boundary <- st_read("data/Scotland_boundary/Scotland_boundary.shp")
@@ -38,8 +38,8 @@ data <- data %>%
 # breaks_y <- c(0.011, 0.043, 0.095, 0.224, 1) # EVCharingCount
 
 
-breaks_x <- c(0, 1.3990826764776994e-05, 4.6818527577032216e-05, 0.000229285122856, 1.0) # population
-breaks_y <- c(0, 0.010498320268756973, 0.02603583426651735, 0.0643896976483762, 1.0) # EVCharingCount
+breaks_x <- c(0, 0.281124517321587, 0.9367164075374605, 4.580700516700745, 19970.693359375) # population
+breaks_y <- c(0, 18.75, 46.5, 115.0, 1786.0) # EVCharingCount
 
 
 

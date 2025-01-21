@@ -3,6 +3,7 @@ import pandas as pd
 import os
 import geopandas as gpd
 from tqdm import tqdm
+import rasterio
 
 # import dask.dataframe as dd
 # from dask import compute, delayed
@@ -28,7 +29,22 @@ PATH3 = os.path.join(DATA_DIR2, 'GB_sample_boudary', 'gadm41_GBR_3.shp')
 SAVE_PATH = os.path.join(DATA_DIR2, 'cleaned.csv')
 SAVE_PATH2 = os.path.join(DATA_DIR2, 'merged.csv')
 SAVE_PATH3 = os.path.join(DATA_DIR2, 'masked.csv')
+
 SAVE_PATH4 = os.path.join(DATA_DIR2, 'normalized.csv')
+SAVE_PATH5 = os.path.join(DATA_DIR2, 'masked2.csv')
+
+
+# PATH4 = os.path.join(DATA_DIR2,'heatmap.tif')
+
+def readTif(path):
+    # 读取栅格数据
+    with rasterio.open(path) as src:
+        # 读取数据
+        data = src.read(1)
+        # 读取元数据
+        meta = src.meta
+    return data, meta
+
 
 def clean_data(df):
     # 统计每个 evse_id 出现的次数
@@ -149,6 +165,36 @@ if __name__ == '__main__':
     # gdf = gdf[gdf['NAME_1'].str.contains('Scotland')]
     # gdf = gdf.to_crs(epsg=4326)
 
+
+    # 3.5
+    # df_cleaned = pd.read_csv(SAVE_PATH) # 读取清洗后的数据
+    # SAVE_PATH3 = os.path.join(DATA_DIR2, 'masked.csv')
+    df2 = pd.read_csv(SAVE_PATH3)
+
+    # print(data)
+    # print(meta)
+
+    # print(df2.head())
+    # print(df_cleaned.head())  
+
+    # tol = 0.01
+
+    # # 使用 tqdm 包裹来遍历 df2
+    # for i in tqdm(range(len(df2))):
+    #     # 获取每一行
+    #     row = df2.iloc[i]
+    #     # 获取经纬度
+    #     lat = row['Y']
+    #     lng = row['X']
+    #     # 获取 Z 和 evse_count
+    #     # Z = row['Z']
+
+
+    #     row['evse_count'] = df_cleaned.loc[(df_cleaned['lat'] > lat - tol) & (df_cleaned['lat'] < lat + tol) & (df_cleaned['lng'] > lng - tol) & (df_cleaned['lng'] < lng + tol), 'duplicate_count'].sum()
+
+    # save_as_csv(df2, SAVE_PATH5) # 保存数据
+
+
     # # 保存 gdf
     # # gdf.to_file(os.path.join(DATA_DIR2, 'Scotland_boundary.shp'))
 
@@ -156,10 +202,10 @@ if __name__ == '__main__':
     # save_as_csv(res, SAVE_PATH3) # 保存数据
 
     # 4. 对 Z 和 evse_count 进行归一化处理 也是就说将 Z 和 evse_count 映射到 [0, 1] 区间
-    df = pd.read_csv(SAVE_PATH3)
-    df['Z'] = (df['Z'] - df['Z'].min()) / (df['Z'].max() - df['Z'].min())
-    df['evse_count'] = (df['evse_count'] - df['evse_count'].min()) / (df['evse_count'].max() - df['evse_count'].min())
-    save_as_csv(df, SAVE_PATH4) # 保存数据
+    # df = pd.read_csv(SAVE_PATH3)
+    # df['Z'] = (df['Z'] - df['Z'].min()) / (df['Z'].max() - df['Z'].min())
+    # df['evse_count'] = (df['evse_count'] - df['evse_count'].min()) / (df['evse_count'].max() - df['evse_count'].min())
+    # save_as_csv(df, SAVE_PATH4) # 保存数据
     
 
 
