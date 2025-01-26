@@ -38,9 +38,14 @@ data <- data %>%
 # breaks_y <- c(0.011, 0.043, 0.095, 0.224, 1) # EVCharingCount
 
 
-breaks_x <- c(0, 0.281124517321587, 0.9367164075374605, 4.580700516700745, 19970.693359375) # population
-breaks_y <- c(0, 18.75, 46.5, 115.0, 1786.0) # EVCharingCount
+# breaks_x <- c(0, 0.281124517321587, 0.9367164075374605, 4.580700516700745, 19970.693359375) # population
+# breaks_y <- c(0, 18.75, 46.5, 115.0, 1786.0) # EVCharingCount
 
+# [0,1,10000,20000]
+# [0,20,50,100,1500]
+
+breaks_x <- c(0, 1, 10, 100, 10000) # population
+breaks_y <- c(0, 20, 50, 100, 1000) # EVCharingCount
 
 
 # 使用 cut 函数手动分段
@@ -58,34 +63,63 @@ data <- bi_class(data, x = EVCharingCount_cut, y = population_cut, dim = 4)
 # 设置双变量颜色调色板
 pallet <- "BlueOr"
 
+# # 创建双变量地图
+# map <- ggplot() +
+#   theme_void(base_size = 14) +  # 设置简洁的主题
+#   xlim(min(data$X), max(data$X)) +  # 设置 X 轴范围
+#   ylim(min(data$Y), max(data$Y)) +  # 设置 Y 轴范围
+#   geom_raster(data = data, mapping = aes(x = X, y = Y, fill = bi_class), color = NA, linewidth = 0.1, show.legend = FALSE) +
+#   bi_scale_fill(pal = pallet, dim = 4, flip_axes = FALSE, rotate_pal = FALSE) +  # 应用双变量颜色
+#   geom_sf(data = boundary, fill = NA, color = "#ff007f", linewidth = 0.2) +  # 添加苏格兰边界
+#   labs(title = "Bi-variate Map of population and EVCharingCount") +
+#   theme(plot.title = element_text(hjust = 0.5, face = "bold"),
+#         plot.subtitle = element_text(hjust = 0.5),
+#         plot.caption = element_text(size = 10, face = "bold", hjust = 1))
+
+# 提取需要高亮的多边形
+highlight_boundary <- boundary %>%
+  filter(NAME_2 %in% c("City of Edinburgh", "Glasgow Cit", "Highland"))
+
+# 提取不需要高亮的多边形
+non_highlight_boundary <- boundary %>%
+  filter(!NAME_2 %in% c("City of Edinburgh", "Glasgow Cit", "Highland"))
+
+# # 融合矢量边界为一个整体边界
+unified_boundary <- boundary %>%
+  st_union()  # 合并所有几何为一个整体边界
+
 # 创建双变量地图
 map <- ggplot() +
   theme_void(base_size = 14) +  # 设置简洁的主题
   xlim(min(data$X), max(data$X)) +  # 设置 X 轴范围
   ylim(min(data$Y), max(data$Y)) +  # 设置 Y 轴范围
-  geom_raster(data = data, mapping = aes(x = X, y = Y, fill = bi_class), color = NA, linewidth = 0.1, show.legend = FALSE) +
+  geom_raster(data = data, mapping = aes(x = X, y = Y, fill = bi_class), color = NA, linewidth = 0.1, show.legend = FALSE) +  # 绘制栅格数据
   bi_scale_fill(pal = pallet, dim = 4, flip_axes = FALSE, rotate_pal = FALSE) +  # 应用双变量颜色
-  geom_sf(data = boundary, fill = NA, color = "black", linewidth = 0.2) +  # 添加苏格兰边界
+
+  geom_sf(data = unified_boundary, color = "#ffffff", fill = NA, linewidth = 1) +  # 绘制融合后的整体边界，覆盖栅格边缘
+  geom_sf(data = non_highlight_boundary, color = "black", fill = NA, linewidth = 0.2) +  # 绘制非高亮的多边形
+  geom_sf(data = highlight_boundary, color = "#ff007f", fill = NA, linewidth = 0.2) +  # 绘制高亮的多边形
+
   labs(title = "Bi-variate Map of population and EVCharingCount") +
   theme(plot.title = element_text(hjust = 0.5, face = "bold"),
         plot.subtitle = element_text(hjust = 0.5),
         plot.caption = element_text(size = 10, face = "bold", hjust = 1))
+
+# （1）图的legend改为：population count; EVCP count。
 
 # 创建图例
 legend <- bi_legend(pal = pallet,
                     flip_axes = FALSE,
                     rotate_pal = FALSE,
                     dim = 4,
-                    xlab = "EVCharingCount",
-                    ylab = "population",
+                    xlab = "EVCP count",
+                    ylab = "population count",
                     size = 10)
 
 # 组合地图和图例
 finalPlot <- ggdraw() +
   draw_plot(map, 0, 0, 1, 1) +  # 绘制主图
-  # draw_plot(legend, 0.05, 0.05, 0.28, 0.28)  # 绘制图例
-  # 在左上角绘制图例
-  draw_plot(legend, 0.05, 0.55, 0.28, 0.28)
+  draw_plot(legend, 0.05, 0.55, 0.28, 0.28)  # 在左上角绘制图例
 
 
 # 显示最终图

@@ -209,4 +209,57 @@ if __name__ == '__main__':
     
 
 
+    # 读取边界数据并打印属性表
+    gdf = gpd.read_file(PATH3)
+    # print(gdf.head())
+    # print(gdf.columns)
+
+    # 答应第一行数据的所有属性
+    # print(gdf.iloc[0])
+    # 打印 NAME_2  的所有唯一值 并查找是否存在 Scotland highland，Edinburgh和Glasgow
+    # print(gdf['NAME_2'].unique())
+    # unique = gdf['NAME_2'].unique()
+    # # 查找是否存在 Scotland highland，Edinburgh和Glasgow
+
+    # for name in ['Scotland highland', 'Edinburgh', 'Glasgow']:
+    #     print(name, name in unique)
+
+# City of Edinburgh
+# Glasgow Cit
+# Highland
+
+
+# NAME_2
+# ['Bath and North East Somerset' 'Bedford' 'Blackburn with Darwen'
+#  'Blackpool' 'Bournemouth, Christchurch and Po' 'Bracknell Forest'
+#  'Bradford' 'Brighton and Hove' 'Buckinghamshire' 'Calderdale'
+#  'Cambridgeshire' 'County Durham' 'Cumbria' 'Darlington' 'Derby'
+#  'Derbyshire' 'Devon' 'Dorset' 'East Sussex' 'Essex' 'Gateshead'
+#  'Gloucestershire' 'Greater London' 'Halton' 'Hampshire' 'Hartlepool'
+#  'Herefordshire, County of' 'Hertfordshire' 'Isle of Wight'
+#  'Isles of Scilly' 'Kent' 'Kingston upon Hull, City of' 'Kirklees'
+#  'Lancashire' 'Leeds' 'Leicestershire' 'Lincolnshire' 'Luton' 'Medway'
+#  'Milton Keynes' 'Norfolk' 'North East Lincolnshire' 'North Yorkshire'
+#  'Northamptonshire' 'Nottinghamshire' 'Oldham' 'Oxfordshire'
+#  'Peterborough' 'Plymouth' 'Sefton' 'Sheffield' 'Somerset'
+#  'South Gloucestershire' 'Southend-on-Sea' 'St. Helens' 'Staffordshire'
+#  'Stockton-on-Tees' 'Suffolk' 'Surrey' 'Swindon' 'Telford and Wrekin'
+#  'Thurrock' 'Torbay' 'Wakefield' 'Warwickshire' 'West Berkshire'
+#  'West Sussex' 'Wirral' 'Wolverhampton' 'Worcestershire' 'York' 'NA'
+#  'Antrim and Newtownabbey' 'Ards and North Down'
+#  'Armagh City, Banbridge and Craig' 'Belfast' 'Causeway Coast and Glens'
+#  'Derry City and Strabane' 'Fermanagh and Omagh' 'Mid and East Antrim'
+#  'Mid Ulster' 'Newry, Mourne and Down' 'Aberdeen City' 'Aberdeenshire'
+#  'Angus' 'Argyll and Bute' 'City of Edinburgh' 'Clackmannanshire'
+#  'Dumfries and Galloway' 'Dundee City' 'East Ayrshire'
+#  'East Dunbartonshire' 'East Lothian' 'East Renfrewshire' 'Falkirk' 'Fife'
+#  'Glasgow City' 'Highland' 'Inverclyde' 'Midlothian' 'Moray'
+#  'Na h-Eileanan Siar' 'North Lanarkshire' 'Orkney Islands'
+#  'Perth and Kinross' 'Renfrewshire' 'Scottish Borders' 'Shetland Islands'
+#  'South Ayrshire' 'South Lanarkshire' 'Stirling' 'West Dunbartonshire'
+#  'West Lothian' 'Caerphilly' 'Cardiff' 'Carmarthenshire' 'Ceredigion'
+#  'Conwy' 'Flintshire' 'Isle of Anglesey' 'Monmouthshire' 'Newport'
+#  'Pembrokeshire' 'Powys' 'Rhondda Cynon Taf']
+
+
 
