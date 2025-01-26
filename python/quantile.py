@@ -8,7 +8,7 @@ DIR = os.path.dirname(__file__)
 DATA_DIR = os.path.join(DIR, '..', 'data')
 DATA_DIR2 = os.path.join(DATA_DIR, '人口-充电桩双变量地图')
 SAVE_PATH4 = os.path.join(DATA_DIR2, 'normalized.csv')
-SAVE_PATH5 = os.path.join(DATA_DIR2, 'masked2.csv')
+SAVE_PATH5 = os.path.join(DATA_DIR, 'resampled.csv')
 
 
 
@@ -108,11 +108,18 @@ if __name__ == "__main__":
     # breaks_x = generate_breaks2(df['Z'], 5)
     # breaks_y = generate_breaks2(df['evse_count'][df['evse_count'] > 0], 5)
 
-    breaks_x = generate_breaks3(df['Z'], 4)
-    breaks_y = generate_breaks3(df['evse_count'][df['evse_count'] > 0], 4)
+    breaks_x = generate_breaks3(df['population'], 4)
+    breaks_y = generate_breaks3(df['EVCharingCount'][df['EVCharingCount'] > 0], 4)
 
+    # 打印出最大值
+    print("Max population:", df['population'].max())
+    print("Max EV Charging Count:", df['EVCharingCount'].max())
 
-    print("Breaks for Z:", breaks_x)
+    # 打印最小值
+    print("Min population:", df['population'].min())
+    print("Min EV Charging Count:", df['EVCharingCount'].min())
+
+    print("Breaks for population:", breaks_x)
     print("Breaks for EV Charging Count:", breaks_y)
 
     # # 绘制柱状图

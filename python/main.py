@@ -4,6 +4,7 @@ import os
 import geopandas as gpd
 from tqdm import tqdm
 import rasterio
+import numpy as np
 
 # import dask.dataframe as dd
 # from dask import compute, delayed
@@ -31,7 +32,7 @@ SAVE_PATH2 = os.path.join(DATA_DIR2, 'merged.csv')
 SAVE_PATH3 = os.path.join(DATA_DIR2, 'masked.csv')
 
 SAVE_PATH4 = os.path.join(DATA_DIR2, 'normalized.csv')
-SAVE_PATH5 = os.path.join(DATA_DIR2, 'masked2.csv')
+SAVE_PATH5 = os.path.join(DATA_DIR2, 'masked3.csv')
 
 
 # PATH4 = os.path.join(DATA_DIR2,'heatmap.tif')
@@ -67,46 +68,15 @@ def save_as_csv(df, path):
     df.to_csv(path, index=False)
     print(f"Save DataFrame to {path} successfully!")
 
-# def assign_grid_counts(df_cleaned, df_population):
-#     # 将 lat 和 lng 转换为 0.01° × 0.01° 的格网
-#     df_cleaned['grid_lat'] = (df_cleaned['lat'] * 100).astype(int) / 100
-#     df_cleaned['grid_lng'] = (df_cleaned['lng'] * 100).astype(int) / 100
-    
-#     # 统计每个格网内的充电桩数量
-#     grid_counts = df_cleaned.groupby(['grid_lat', 'grid_lng']).size().reset_index(name='evse_count')
-    
-#     # 将格网统计结果与人口数据合并
-#     df_population['grid_lat'] = (df_population['Y'] * 100).astype(int) / 100
-#     df_population['grid_lng'] = (df_population['X'] * 100).astype(int) / 100
-    
-#     # 合并数据
-#     df_merged = df_population.merge(grid_counts, on=['grid_lat', 'grid_lng'], how='left')
-    
-#     # 填充缺失值为 0（表示该格网内没有充电桩）
-#     df_merged['evse_count'] = df_merged['evse_count'].fillna(0).astype(int)
-    
-#     # 删除临时列
-#     df_merged.drop(columns=['grid_lat', 'grid_lng'], inplace=True)
-    
-#     return df_merged
-
 def assign_grid_counts(df_cleaned, df_population):
-    # 确保 lat 和 lng 列是浮点数类型
-    df_cleaned['lat'] = df_cleaned['lat'].astype(float)
-    df_cleaned['lng'] = df_cleaned['lng'].astype(float)
-    
     # 将 lat 和 lng 转换为 0.01° × 0.01° 的格网
     df_cleaned['grid_lat'] = (df_cleaned['lat'] * 100).astype(int) / 100
     df_cleaned['grid_lng'] = (df_cleaned['lng'] * 100).astype(int) / 100
     
-    # 统计每个格网内的充电桩数量，考虑 duplicate_count 列
-    grid_counts = df_cleaned.groupby(['grid_lat', 'grid_lng'])['duplicate_count'].sum().reset_index(name='evse_count')
+    # 统计每个格网内的充电桩数量
+    grid_counts = df_cleaned.groupby(['grid_lat', 'grid_lng']).size().reset_index(name='evse_count')
     
-    # 确保 df_population 中的 X 和 Y 列是浮点数类型
-    df_population['X'] = df_population['X'].astype(float)
-    df_population['Y'] = df_population['Y'].astype(float)
-    
-    # 将 df_population 中的 X 和 Y 转换为 0.01° × 0.01° 的格网
+    # 将格网统计结果与人口数据合并
     df_population['grid_lat'] = (df_population['Y'] * 100).astype(int) / 100
     df_population['grid_lng'] = (df_population['X'] * 100).astype(int) / 100
     
@@ -120,6 +90,9 @@ def assign_grid_counts(df_cleaned, df_population):
     df_merged.drop(columns=['grid_lat', 'grid_lng'], inplace=True)
     
     return df_merged
+
+
+
 
 def mask(gdf, df):
     # 合并所有几何对象为一个几何对象
@@ -148,9 +121,9 @@ def geometryGetValue(gdf, df):
 
 if __name__ == '__main__':
     # 1.
-    # df = pd.read_csv(PATH)
-    # df = clean_data(df)
-    # save_as_csv(df, SAVE_PATH)
+    df = pd.read_csv(PATH)
+    df = clean_data(df)
+    save_as_csv(df, SAVE_PATH)
 
     # 2.
     # df_cleaned = pd.read_csv(SAVE_PATH) # 读取清洗后的数据
@@ -167,7 +140,7 @@ if __name__ == '__main__':
 
 
     # 3.5
-    # df_cleaned = pd.read_csv(SAVE_PATH) # 读取清洗后的数据
+    df_cleaned = pd.read_csv(SAVE_PATH) # 读取清洗后的数据
     # SAVE_PATH3 = os.path.join(DATA_DIR2, 'masked.csv')
     df2 = pd.read_csv(SAVE_PATH3)
 
@@ -177,22 +150,21 @@ if __name__ == '__main__':
     # print(df2.head())
     # print(df_cleaned.head())  
 
-    # tol = 0.01
+    tol = 0.01
 
-    # # 使用 tqdm 包裹来遍历 df2
-    # for i in tqdm(range(len(df2))):
-    #     # 获取每一行
-    #     row = df2.iloc[i]
-    #     # 获取经纬度
-    #     lat = row['Y']
-    #     lng = row['X']
-    #     # 获取 Z 和 evse_count
-    #     # Z = row['Z']
+    # 使用 tqdm 包裹来遍历 df2
+    for i in tqdm(range(len(df2))):
+        # 获取每一行
+        row = df2.iloc[i]
+        # 获取经纬度
+        lat = row['Y']
+        lng = row['X']
+        # 获取 Z 和 evse_count
+        Z = row['Z']
 
+    row['evse_count'] = df_cleaned.loc[(df_cleaned['lat'] > lat - tol) & (df_cleaned['lat'] < lat + tol) & (df_cleaned['lng'] > lng - tol) & (df_cleaned['lng'] < lng + tol), 'duplicate_count'].sum()
 
-    #     row['evse_count'] = df_cleaned.loc[(df_cleaned['lat'] > lat - tol) & (df_cleaned['lat'] < lat + tol) & (df_cleaned['lng'] > lng - tol) & (df_cleaned['lng'] < lng + tol), 'duplicate_count'].sum()
-
-    # save_as_csv(df2, SAVE_PATH5) # 保存数据
+    save_as_csv(df2, SAVE_PATH5) # 保存数据
 
 
     # # 保存 gdf
@@ -210,7 +182,7 @@ if __name__ == '__main__':
 
 
     # 读取边界数据并打印属性表
-    gdf = gpd.read_file(PATH3)
+    # gdf = gpd.read_file(PATH3)
     # print(gdf.head())
     # print(gdf.columns)
 
@@ -224,42 +196,6 @@ if __name__ == '__main__':
     # for name in ['Scotland highland', 'Edinburgh', 'Glasgow']:
     #     print(name, name in unique)
 
-# City of Edinburgh
-# Glasgow Cit
-# Highland
-
-
-# NAME_2
-# ['Bath and North East Somerset' 'Bedford' 'Blackburn with Darwen'
-#  'Blackpool' 'Bournemouth, Christchurch and Po' 'Bracknell Forest'
-#  'Bradford' 'Brighton and Hove' 'Buckinghamshire' 'Calderdale'
-#  'Cambridgeshire' 'County Durham' 'Cumbria' 'Darlington' 'Derby'
-#  'Derbyshire' 'Devon' 'Dorset' 'East Sussex' 'Essex' 'Gateshead'
-#  'Gloucestershire' 'Greater London' 'Halton' 'Hampshire' 'Hartlepool'
-#  'Herefordshire, County of' 'Hertfordshire' 'Isle of Wight'
-#  'Isles of Scilly' 'Kent' 'Kingston upon Hull, City of' 'Kirklees'
-#  'Lancashire' 'Leeds' 'Leicestershire' 'Lincolnshire' 'Luton' 'Medway'
-#  'Milton Keynes' 'Norfolk' 'North East Lincolnshire' 'North Yorkshire'
-#  'Northamptonshire' 'Nottinghamshire' 'Oldham' 'Oxfordshire'
-#  'Peterborough' 'Plymouth' 'Sefton' 'Sheffield' 'Somerset'
-#  'South Gloucestershire' 'Southend-on-Sea' 'St. Helens' 'Staffordshire'
-#  'Stockton-on-Tees' 'Suffolk' 'Surrey' 'Swindon' 'Telford and Wrekin'
-#  'Thurrock' 'Torbay' 'Wakefield' 'Warwickshire' 'West Berkshire'
-#  'West Sussex' 'Wirral' 'Wolverhampton' 'Worcestershire' 'York' 'NA'
-#  'Antrim and Newtownabbey' 'Ards and North Down'
-#  'Armagh City, Banbridge and Craig' 'Belfast' 'Causeway Coast and Glens'
-#  'Derry City and Strabane' 'Fermanagh and Omagh' 'Mid and East Antrim'
-#  'Mid Ulster' 'Newry, Mourne and Down' 'Aberdeen City' 'Aberdeenshire'
-#  'Angus' 'Argyll and Bute' 'City of Edinburgh' 'Clackmannanshire'
-#  'Dumfries and Galloway' 'Dundee City' 'East Ayrshire'
-#  'East Dunbartonshire' 'East Lothian' 'East Renfrewshire' 'Falkirk' 'Fife'
-#  'Glasgow City' 'Highland' 'Inverclyde' 'Midlothian' 'Moray'
-#  'Na h-Eileanan Siar' 'North Lanarkshire' 'Orkney Islands'
-#  'Perth and Kinross' 'Renfrewshire' 'Scottish Borders' 'Shetland Islands'
-#  'South Ayrshire' 'South Lanarkshire' 'Stirling' 'West Dunbartonshire'
-#  'West Lothian' 'Caerphilly' 'Cardiff' 'Carmarthenshire' 'Ceredigion'
-#  'Conwy' 'Flintshire' 'Isle of Anglesey' 'Monmouthshire' 'Newport'
-#  'Pembrokeshire' 'Powys' 'Rhondda Cynon Taf']
 
 
 

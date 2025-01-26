@@ -9,7 +9,7 @@ library(cowplot)    # 用于组合图和图例
 library(dplyr)      # 用于数据处理
 
 # 读取数据
-data <- read.csv("data/masked2.csv")
+data <- read.csv("data/resampled.csv")
 
 # 读取苏格兰边界数据
 boundary <- st_read("data/Scotland_boundary/Scotland_boundary.shp")
@@ -27,8 +27,8 @@ data <- data %>%
   )
 
 
-breaks_x <- c(0, 1, 10, 100, 10000) # population
-breaks_y <- c(0, 20, 50, 100, 1000) # EVCharingCount
+breaks_x <- c(0, 2, 12, 500, 7638) # population
+breaks_y <- c(0, 28, 88, 250, 5440) # EVCharingCount
 
 
 # 使用 cut 函数手动分段
@@ -89,6 +89,8 @@ finalPlot <- ggdraw() +
   draw_plot(map, 0, 0, 1, 1) +  # 绘制主图
   draw_plot(legend, 0.05, 0.55, 0.28, 0.28)  # 在左上角绘制图例
 
+# 找到颜色为 #7F7F7F 的位置 并将值打印出来
+# print(which(finalPlot$labels$fill == "#7F7F7F"))
 
 # 显示最终图
 print(finalPlot)

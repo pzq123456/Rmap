@@ -85,6 +85,9 @@ finalPlot <- ggdraw() +
   draw_plot(legend, 0.05, 0.55, 0.28, 0.28)  # 在左上角绘制图例
 
 
+
+
+
 # 显示最终图
 print(finalPlot)
 
